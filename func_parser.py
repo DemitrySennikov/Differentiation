@@ -23,7 +23,7 @@ def parse_terms(expression):
 
 def parse_functions(term):
     current = 1
-    while term[current].isdigit() or term.current == '.':
+    while term[current].isdigit() or term[current] == '.':
         current += 1
     const = float(term[:current])
     functions = []
