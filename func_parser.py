@@ -1,4 +1,5 @@
 import function
+import math
 
 
 def parse_terms(expression):
@@ -42,7 +43,26 @@ def parse_functions(term):
             current += 1
             continue
         if term[current] == '^':
-            pass
+            current += 1
+            if term[current].isdigit():
+                power = int(term[current])
+                current += 1
+            elif term[current] == 'x':
+                power = 'x'
+                current += 1
+            elif term[current] == '{':
+                power, current = _select_under_brackets(term, current)
+            base, arg, current = _define_function_args(term, f.func, current)
+            if base is None:
+                base = '\\' + f.func + '{' + arg + '}'
+            else:
+                base = base = '\\' + f.func + '{' + base + '}{' + arg + '}'
+            if 'x' in power:
+                f.func = 'powexp'
+            else:
+                f.func = 'pow'
+            f.base = base
+            f.arg = power
         else:
             if f.func == 'pow':
                 f.arg = 1
@@ -78,4 +98,18 @@ def _define_elementary_function(expression, current):
 
 
 def _define_function_args(expression, func, current):
-    pass
+    trigonometric_functions = ['cos', 'sin', 'tan', 'cot', 
+                               'arcsin', 'arccos', 'arctan', 'arccot']
+    logarithmic_unary_fuctions = ['lg', 'ln']
+    binary_functions = ['sqrt', 'log']
+    if func in trigonometric_functions:
+        base = None
+    elif func in logarithmic_unary_fuctions:
+        if func == 'lg':
+            base = 10
+        elif func == 'ln':
+            base = math.e
+    elif func in binary_functions:
+        base, current = _select_under_brackets(expression, current)
+    arg, current = _select_under_brackets(expression, current)
+    return base, arg, current
