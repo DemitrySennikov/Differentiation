@@ -27,8 +27,13 @@ def differentiate(_expression: str, _variable: str):
 
 
 if __name__ == "__main__":
-    argparser = argparse.ArgumentParser()
-    argparser.add_argument('function', type=str)
+    argparser = argparse.ArgumentParser(
+        prog='symbolic-differentiation',
+        description='This program finds the derivative of a given '
+                    'function in symbolic form.')
+    argparser.add_argument('function', type=str,
+                           help="Function of x, y, z as a string. "
+                                "Not all variables need to be used.")
     args = argparser.parse_args()
     function = args.function.replace(' ', '')
     try:
@@ -43,12 +48,12 @@ if __name__ == "__main__":
         if len(variables) == 1:
             variable = variables[0]
             print(f"f({variable}) = {function}")
-            print(f"df({variable})/d{variable} = "
+            print(f"df/d{variable} = "
                   f"{differentiate(function, variable)}")
         else:
             print(f"f({', '.join(variables)}) = {function}")
             for variable in variables:
-                print(f"δf({', '.join(variables)})/δ{variable} = "
+                print(f"δf/δ{variable} = "
                       f"{differentiate(function, variable)}")
     except Exception as e:
         print(e)
