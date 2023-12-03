@@ -1,5 +1,5 @@
 from tokens import BINARY_TOKENS, UNARY_TOKENS, CONSTANTS
-from tokens import TOKENS
+from tokens import TOKENS, VARIABLE_TOKENS
 
 
 def create_tokens(expression: str):
@@ -50,8 +50,8 @@ def is_correct_operations(expression_tokens: list):
     for i in range(len(expression_tokens)):
         token = expression_tokens[i]
         if token[0] in BINARY_TOKENS:
-            if (i == 0 or (expression_tokens[i - 1][0] not in [')', 'x',
-                                                               *CONSTANTS] and
+            if (i == 0 or (expression_tokens[i - 1][0] not in
+                           [')', *VARIABLE_TOKENS, *CONSTANTS] and
                            not expression_tokens[i - 1][0][0].isdigit())):
                 raise ValueError(
                     f'{token[1]}: Binary operation without first argument')
@@ -65,3 +65,4 @@ def is_correct_operations(expression_tokens: list):
                 raise ValueError(
                     f'{token[1]}: Unary operation without argument')
     return True
+

@@ -5,7 +5,7 @@ from expression_tree import ExpressionTreeNode
 from parse import parse
 
 
-def differentiate(_expression: str):
+def differentiate(_expression: str, _variable: str):
     _input, expression_in_inverse_notation = parse(_expression)
     nodes_stack = []
     for symbol in expression_in_inverse_notation:
@@ -20,7 +20,7 @@ def differentiate(_expression: str):
             nodes_stack.append(ExpressionTreeNode(_type, value, nodes))
         else:
             nodes_stack.append(ExpressionTreeNode(_type, value))
-    result = str(nodes_stack.pop().differentiate(True))
+    result = str(nodes_stack.pop().differentiate(True, _variable))
     if result[0] == "(" and result[-1] == ")":
         return result[1:-1]
     return result
@@ -28,11 +28,27 @@ def differentiate(_expression: str):
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
-    argparser.add_argument('expression', type=str)
+    argparser.add_argument('function', type=str)
     args = argparser.parse_args()
-    expression = args.expression
+    function = args.function.replace(' ', '')
     try:
-        print(f"f(x) = {expression.replace(' ', '')}")
-        print(f"f'(x) = {differentiate(expression)}")
+        if len(function) == 0:
+            raise ValueError("Empty string.")
+        variables = []
+        for variable in ["x", "y", "z"]:
+            if variable in function:
+                variables.append(variable)
+        if len(variables) == 0:
+            variables.append("x")
+        if len(variables) == 1:
+            variable = variables[0]
+            print(f"f({variable}) = {function}")
+            print(f"df({variable})/d{variable} = "
+                  f"{differentiate(function, variable)}")
+        else:
+            print(f"f({', '.join(variables)}) = {function}")
+            for variable in variables:
+                print(f"δf({', '.join(variables)})/δ{variable} = "
+                      f"{differentiate(function, variable)}")
     except Exception as e:
         print(e)

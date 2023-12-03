@@ -8,7 +8,7 @@ from operation import Operation
 
 class ExpressionTreeNode:
     def __init__(self, node_type: NodeType,
-                 node_value: None | isinstance(Number) | isinstance(
+                 node_value: None | str | isinstance(Number) | isinstance(
                      Operation) = None,
                  arguments: list[ExpressionTreeNode] = ()):
 
@@ -36,11 +36,17 @@ class ExpressionTreeNode:
             return False
         return self._value == constant
 
-    def differentiate(self, should_reduce: bool = False) -> ExpressionTreeNode:
+    def _is_variable(self, variable):
+        return self._type == NodeType.VARIABLE and self._value == variable
+
+    def differentiate(self, should_reduce: bool = False,
+                      variable: str = "x") -> ExpressionTreeNode:
         if self._type == NodeType.CONSTANT:
             return ExpressionTreeNode(NodeType.CONSTANT, 0)
         if self._type == NodeType.VARIABLE:
-            return ExpressionTreeNode(NodeType.CONSTANT, 1)
+            if self._is_variable(variable):
+                return ExpressionTreeNode(NodeType.CONSTANT, 1)
+            return ExpressionTreeNode(NodeType.CONSTANT, 0)
 
         name = self._value.name
         arity = self._value.arity
@@ -60,31 +66,36 @@ class ExpressionTreeNode:
                     outer_derivative = _cos(operand)
                 case _:
                     raise ValueError("Wrong operation!")
-            result = _multiply(outer_derivative, operand.differentiate())
+            result = _multiply(outer_derivative,
+                               operand.differentiate(should_reduce, variable))
 
         if arity == 2:
             first, second = self._arguments[0], self._arguments[1]
             match self._value.name:
                 case "ADDITION":
-                    result = _add(first.differentiate(),
-                                  second.differentiate())
+                    result = _add(first.differentiate(should_reduce, variable),
+                                  second.differentiate(should_reduce,
+                                                       variable))
                 case "MULTIPLICATION":
-                    first_term = _multiply(first.differentiate(),
-                                           second)
+                    first_term = _multiply(
+                        first.differentiate(should_reduce, variable),
+                        second)
                     second_term = _multiply(first,
-                                            second.differentiate())
+                                            second.differentiate(should_reduce,
+                                                                 variable))
 
                     result = _add(first_term, second_term)
                 case "SUBTRACTION":
-                    result = _subtract(first.differentiate(),
-                                       second.differentiate())
+                    result = _subtract(
+                        first.differentiate(should_reduce, variable),
+                        second.differentiate(should_reduce, variable))
                 case "DIVISION":
                     first_term_of_numerator = _multiply(
-                        first.differentiate(),
+                        first.differentiate(should_reduce, variable),
                         second)
                     second_term_of_numerator = _multiply(
                         first,
-                        second.differentiate())
+                        second.differentiate(should_reduce, variable))
 
                     numerator = _subtract(first_term_of_numerator,
                                           second_term_of_numerator)
@@ -94,19 +105,22 @@ class ExpressionTreeNode:
                 case "POWER":
                     if self._arguments[0].is_constant(math.e):
                         result = _multiply(self,
-                                           self._arguments[1].differentiate())
-                    elif self._arguments[0]._type == NodeType.VARIABLE \
+                                           self._arguments[1].differentiate(
+                                               should_reduce, variable))
+                    elif self._arguments[0]._is_variable(variable) \
                             and self._arguments[1]._type == NodeType.CONSTANT:
                         _power_number = self._arguments[1]._value
                         result = _multiply(_constant(_power_number),
-                                           _power(_variable(),
+                                           _power(_variable(variable),
                                                   _constant(
                                                       _power_number - 1)))
 
                     else:
-                        result = _power(_constant(math.e),
-                                        _multiply(self._arguments[1],
-                                                  _ln(self._arguments[0])))
+                        argument = _multiply(self._arguments[1],
+                                             _ln(self._arguments[0]))
+                        outer = _power(_constant(math.e), argument)
+                        inner = argument.differentiate(should_reduce, variable)
+                        result = _multiply(outer, inner)
                 case _:
                     raise ValueError("Wrong operation!")
         if should_reduce:
@@ -126,7 +140,7 @@ class ExpressionTreeNode:
         if _type == NodeType.CONSTANT:
             return self_value == other_value
         if _type == NodeType.VARIABLE:
-            return True
+            return self_value == other_value
         if _type == NodeType.OPERATION:
             if self._value.name != other._value.name:
                 return False
@@ -246,7 +260,7 @@ class ExpressionTreeNode:
     def __str__(self):
         match self._type:
             case NodeType.VARIABLE:
-                return "x"
+                return self._value
             case NodeType.CONSTANT:
                 if self._value == math.e:
                     return "e"
@@ -320,6 +334,4 @@ _sin = lambda argument: _unary_operation(argument, SINUS)
 _cos = lambda argument: _unary_operation(argument, COSINUS)
 _neg = lambda argument: _unary_operation(argument, NEGATION)
 
-_variable = lambda: ExpressionTreeNode(NodeType.VARIABLE, None, [])
-
-
+_variable = lambda var: ExpressionTreeNode(NodeType.VARIABLE, var, [])

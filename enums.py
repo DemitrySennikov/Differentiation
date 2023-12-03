@@ -36,7 +36,11 @@ def token_to_enum(token: str) -> (NodeType, Operation | int):
         case "ln":
             _type, value = NodeType.OPERATION, NATURAL_LOGARITHM
         case "x":
-            _type, value = NodeType.VARIABLE, None
+            _type, value = NodeType.VARIABLE, "x"
+        case "y":
+            _type, value = NodeType.VARIABLE, "y"
+        case "z":
+            _type, value = NodeType.VARIABLE, "z"
         case "e":
             _type, value = NodeType.CONSTANT, math.e
         case "pi":
