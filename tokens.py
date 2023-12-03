@@ -1,12 +1,11 @@
 BINARY_TOKENS = {'+', '/', '*', '^'}
 
-TRIGONOMETRY_TOKENS = {'sin', 'cos', 'tg', 'ctg', 'arcsin', 'arccos', 'arctg',
-                       'arcctg'}
-LOGARITHM_TOKENS = {'ln', 'lg'}
-FUNCTION_TOKENS = {*TRIGONOMETRY_TOKENS, *LOGARITHM_TOKENS}
+FUNCTION_TOKENS = {'sin', 'cos', 'ln'}
 
 UNARY_TOKENS = {'-', *FUNCTION_TOKENS}
 
+VARIABLE_TOKENS = {'x', 'y', 'z'}
+
 CONSTANTS = {'pi', 'e'}
 
-TOKENS = {*UNARY_TOKENS, *BINARY_TOKENS, *CONSTANTS, 'x', '(', ')'}
+TOKENS = {*UNARY_TOKENS, *BINARY_TOKENS, *CONSTANTS, *VARIABLE_TOKENS, '(', ')'}
