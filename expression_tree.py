@@ -8,7 +8,7 @@ from operation import Operation
 
 class ExpressionTreeNode:
     def __init__(self, node_type: NodeType,
-                 node_value: None | str | isinstance(Number) | isinstance(
+                 node_value: None | str | isinstance(Number ) | isinstance(
                      Operation) = None,
                  arguments: list[ExpressionTreeNode] = ()):
 
