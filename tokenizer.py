@@ -1,5 +1,6 @@
 from tokens import BINARY_TOKENS, UNARY_TOKENS, CONSTANTS
 from tokens import TOKENS, VARIABLE_TOKENS
+from tokens import TOKENS, VARIABLE_TOKENS
 
 
 def create_tokens(expression: str):
@@ -15,6 +16,12 @@ def create_tokens(expression: str):
                     if has_dot:
                         raise SyntaxError(f'{start}: Number with 2 dots')
                     has_dot = True
+                    if current + 1 == len(expression):
+                        raise SyntaxError(
+                            f'{current}: Dot without fractional part')
+                    if not expression[current+1].isdigit():
+                        raise SyntaxError(
+                            f'{current}: Dot without fractional part')
                 elif not expression[current].isdigit():
                     break
                 current += 1
@@ -50,7 +57,7 @@ def is_correct_operations(expression_tokens: list):
     for i in range(len(expression_tokens)):
         token = expression_tokens[i]
         if token[0] in BINARY_TOKENS:
-            if (i == 0 or (expression_tokens[i - 1][0] not in
+            if (i == 0 or (expression_tokens[i - 1][0] not in 
                            [')', *VARIABLE_TOKENS, *CONSTANTS] and
                            not expression_tokens[i - 1][0][0].isdigit())):
                 raise ValueError(
