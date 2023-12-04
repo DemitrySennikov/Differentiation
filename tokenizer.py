@@ -1,5 +1,6 @@
 from tokens import BINARY_TOKENS, UNARY_TOKENS, CONSTANTS
 from tokens import TOKENS, VARIABLE_TOKENS
+from tokens import TOKENS, VARIABLE_TOKENS
 
 
 def create_tokens(expression: str):
@@ -65,3 +66,4 @@ def is_correct_operations(expression_tokens: list):
                 raise ValueError(
                     f'{token[1]}: Unary operation without argument')
     return True
+
