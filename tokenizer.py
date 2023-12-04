@@ -16,6 +16,12 @@ def create_tokens(expression: str):
                     if has_dot:
                         raise SyntaxError(f'{start}: Number with 2 dots')
                     has_dot = True
+                    if current + 1 == len(expression):
+                        raise SyntaxError(
+                            f'{current}: Dot without fractional part')
+                    if not expression[current+1].isdigit():
+                        raise SyntaxError(
+                            f'{current}: Dot without fractional part')
                 elif not expression[current].isdigit():
                     break
                 current += 1
